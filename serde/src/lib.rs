@@ -296,3 +296,15 @@ extern crate serde_derive;
 #[cfg(feature = "serde_derive")]
 #[doc(hidden)]
 pub use serde_derive::*;
+
+/// Generates implementations of `Serialize` and `Deserialize` and returns it as a `String`
+pub trait Codegen {
+    /// Returns the type definition
+    fn type_definition() -> String;
+
+    /// Returns the generated code for serialization
+    fn serialization_code() -> String;
+
+    /// Returns the generated code for deserialization
+    fn deserialization_code() -> String;
+}

@@ -10,7 +10,7 @@ pub fn replacement() -> TokenStream {
 
     quote! {
         #[allow(unused_macros)]
-        macro_rules! try {
+        macro_rules! attempt {
             (#dollar __expr:expr) => {
                 match #dollar __expr {
                     _serde::__private::Ok(__val) => __val,

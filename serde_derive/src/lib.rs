@@ -86,6 +86,41 @@ mod pretend;
 mod ser;
 mod try;
 
+#[proc_macro_derive(Codegen)]
+pub fn derive_serialize_code(input: TokenStream) -> TokenStream {
+    let input_type = input.clone().to_string();
+    let mut input = parse_macro_input!(input as DeriveInput);
+
+    let ser_code = ser::expand_derive_serialize(&mut input.clone())
+        .unwrap_or_else(to_compile_errors)
+        .to_string();
+
+    let des_code = de::expand_derive_deserialize(&mut input)
+        .unwrap_or_else(to_compile_errors)
+        .to_string();
+
+    let ident = input.ident;
+    let output = quote! {
+        impl Codegen for #ident {
+            fn type_definition() -> String {
+                format!("{}", #input_type)
+            }
+
+            fn serialization_code() -> String {
+                format!("{}", #ser_code)
+            }
+
+            fn deserialization_code() -> String {
+                format!("{}", #des_code)
+            }
+        }
+    }.into();
+
+    std::fs::write("/tmp/output",
+        format!("{}\n", output)).unwrap();
+    output
+}
+
 #[proc_macro_derive(Serialize, attributes(serde))]
 pub fn derive_serialize(input: TokenStream) -> TokenStream {
     let mut input = parse_macro_input!(input as DeriveInput);
